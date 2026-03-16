@@ -79,6 +79,43 @@ public class HotelBookingApp {
         }
     }
 
+    public static class Reservation {
+        private String guestName;
+        private String roomType;
+        
+        public Reservation(String guestName, String roomType){
+            this.guestName = guestName;
+            this.roomType = roomType;
+        }
+
+        public String getGuestName() {
+            return guestName;
+        }
+        public String getRoomType(){
+            return roomType;
+        }
+    }
+
+    public static class BookingRequestQueue{
+        private Queue<Reservation> requestQueue;
+
+        public BookingRequestQueue() {
+            requestQueue = new LinkedList<>();
+        }
+
+        public void addRequest(Reservation reservation){
+            requestQueue.offer(reservation);
+        }
+
+        public Reservation getNextRequest(){
+            return requestQueue.poll();
+        }
+
+        public boolean hasPendingrequest(){
+            return !requestQueue.isEmpty();
+        }
+    }
+
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
@@ -109,11 +146,22 @@ public class HotelBookingApp {
                 
                 RoomService room = new RoomService();
                 room.searchAvailableRooms(inventory, single, doubleRoom, suite);
-
         }
 
+        System.out.println("Booking Request Queue: ");
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
+        Reservation r1 = new Reservation("Abhi","Single");
+        Reservation r2 = new Reservation("Subha","Double");
+        Reservation r3 = new Reservation("Vanmathi","Suite");
 
+        bookingQueue.addRequest(r1);
+        bookingQueue.addRequest(r2);
+        bookingQueue.addRequest(r3);
 
+        while(bookingQueue.hasPendingrequest()){
+            Reservation reservation = bookingQueue.getNextRequest();
+            System.out.println("Processing booking for Guest :"+reservation.getGuestName()+", Room Type: "+reservation.getRoomType());
+        }
     }
 }
