@@ -60,6 +60,25 @@ public class HotelBookingApp {
         }
     }
 
+    public static class RoomService{
+        public void searchAvailableRooms(RoomInventory inventory, Room singleRoom, Room doubleRoom, Room suiteRoom){
+            Map<String,Integer> availability = inventory.getRoomAvailability();
+
+            if(availability.get("SingleRoom")> 0) {
+                System.out.println("SingleRoom: ");
+                singleRoom.displayRoomDetails();
+            }
+            if(availability.get("DoubleRoom")> 0) {
+                System.out.println("SingleRoom: ");
+                doubleRoom.displayRoomDetails();
+            }
+            if(availability.get("SuiteRoom")> 0) {
+                System.out.println("SuiteRoom: ");
+                suiteRoom.displayRoomDetails();
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
@@ -86,9 +105,10 @@ public class HotelBookingApp {
                     System.out.println("SuiteRoom: ");
                     suite.displayRoomDetails();
                     System.out.println();
-            }
-
-
+                }
+                
+                RoomService room = new RoomService();
+                room.searchAvailableRooms(inventory, single, doubleRoom, suite);
 
         }
 
