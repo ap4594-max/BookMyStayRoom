@@ -116,6 +116,45 @@ public class HotelBookingApp {
         }
     }
 
+    public static class RoomAllocationService {
+        private Set<String> allocatedRoomIds;
+
+        private Map<String, Set<String>> assignedRoomsByType;
+
+        public RoomAllocationService(){
+            allocatedRoomIds = new HashSet<>();
+            assignedRoomsByType = new HashMap<>();
+        }
+
+        public void allocateRoom(Reservation reservation, RoomInventory inventory){
+            String roomType = reservation.getRoomType();
+            int available = inventory.getRoomAvailability().get(roomType);
+
+            if(available <=0){
+                System.out.println("No rooms available for "+roomType);
+                return ;
+            }
+
+            String roomId = generateRoomId(roomType);
+
+            allocatedRoomIds.add(roomId);
+
+            assignedRoomsByType
+                .computeIfAbsent(roomType,k->new HashSet<>())
+                .add(roomId);
+                inventory.updateAvailability(roomType, available-1);
+                System.out.println("Booking Confirmed for Guest : "+reservation.getGuestName()+"Room ID: "+roomId);
+        }
+        private String generateRoomId(String roomType){
+            int count = assignedRoomsByType.getOrDefault(roomType, new HashSet<>())
+            .size()+1;
+            return roomType + "-" + count;
+        }
+
+    }
+
+
+
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
@@ -162,6 +201,15 @@ public class HotelBookingApp {
         while(bookingQueue.hasPendingrequest()){
             Reservation reservation = bookingQueue.getNextRequest();
             System.out.println("Processing booking for Guest :"+reservation.getGuestName()+", Room Type: "+reservation.getRoomType());
+        }
+
+        System.out.println("Room Allocation Processing");
+        RoomAllocationService allocator = new RoomAllocationService();
+
+        while(bookingQueue.hasPendingrequest()){
+            Reservation reservation  = bookingQueue.getNextRequest();
+            allocator.allocateRoom(reservation,inventory);
+              System.out.println("Processing booking for Guest :"+reservation.getGuestName()+", Room Type: "+reservation.getRoomType());
         }
     }
 }
