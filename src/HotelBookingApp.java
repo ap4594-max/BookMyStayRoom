@@ -1,3 +1,4 @@
+import java.util.*;
 public class HotelBookingApp {
     public abstract class Room{
         protected int numberOfBeds;
@@ -36,6 +37,29 @@ public class HotelBookingApp {
         }
     }
 
+    public static class RoomInventory{
+        private Map<String, Integer> roomAvailability;
+
+        public RoomInventory(){
+            roomAvailability  = new HashMap<>();
+            initializeInventory();
+        }
+
+        private void initializeInventory(){
+            roomAvailability.put("SingleRoom",1);
+            roomAvailability.put("DoubleRoom",3);
+            roomAvailability.put("SuiteRoom",2);
+        }
+
+        public Map<String, Integer> getRoomAvailability(){
+            return roomAvailability;
+        }
+
+        public void updateAvailability(String roomType, int count){
+            roomAvailability.put(roomType,count);
+        }
+    }
+
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
@@ -45,11 +69,31 @@ public class HotelBookingApp {
         Room doubleRoom = app.new DoubleRoom();
         Room suite = app.new SuiteRoom();
 
-        single.displayRoomDetails();
-        System.out.println();
-        doubleRoom.displayRoomDetails();
-        System.out.println();
-        suite.displayRoomDetails();
+        System.out.println("Hotel Room Inventory Status\n");
+
+        RoomInventory inventory = new RoomInventory();
+        for(Map.Entry<String,Integer> entry: inventory.getRoomAvailability().entrySet()){
+            String key = entry.getKey();
+                if (key.equals("SingleRoom")) {
+                    System.out.println("SingleRoom: ");
+                    single.displayRoomDetails();
+                    System.out.println();
+            } else if (key.equals("DoubleRoom")) {
+                    System.out.println("DoubleRoom: ");
+                    doubleRoom.displayRoomDetails();
+                    System.out.println();
+            } else if (key.equals("SuiteRoom")) {
+                    System.out.println("SuiteRoom: ");
+                    suite.displayRoomDetails();
+                    System.out.println();
+            }
+
+
+
+        }
+
+
+
 
     }
 }
