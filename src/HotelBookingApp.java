@@ -94,6 +94,11 @@ public class HotelBookingApp {
         public String getRoomType(){
             return roomType;
         }
+
+        @Override
+        public String toString() {
+            return guestName + " booked a " + roomType + " room";
+        }
     }
 
     public static class BookingRequestQueue{
@@ -190,6 +195,27 @@ public class HotelBookingApp {
             }
     }
 
+    public static class BookingHistory{
+        private List<Reservation> confirmedReservations;
+
+        public BookingHistory(){
+            confirmedReservations = new ArrayList<>(); 
+        }
+
+        public void addReservation(Reservation reservation){
+            confirmedReservations.add(reservation);   
+        }
+        public List<Reservation> getConfirmedReservations(){
+            return confirmedReservations;
+        }
+    }
+
+    public static class BookingReportService {
+        public void  generateReport(BookingHistory history){
+            System.out.println(history.getConfirmedReservations());
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
 
@@ -256,5 +282,20 @@ public class HotelBookingApp {
         }
         serviceManager.addService("Single-1",services);
         System.out.println("Total Add-On Cost : "+serviceManager.calculateTotalServiceCost("Single-1"));
+
+        BookingHistory history = new BookingHistory();
+        String[] guestnames = {"abhi","Subha","Vanmathi"};
+        String[] roomType = {"Single","Double","Suite"};
+
+        for(int i=0;i<guestnames.length;i++){
+            Reservation reservation = new Reservation(guestnames[i], roomType[i]);
+            history.addReservation(reservation);
+        }
+        System.out.println("Booking History and Reporting");
+        System.out.println();
+        System.out.println("Booking History Report");
+        for (Reservation r : history.getConfirmedReservations()) {
+            System.out.println(r);
+        }
     }
 }
