@@ -153,8 +153,42 @@ public class HotelBookingApp {
 
     }
 
+    public static class Service{
+        private String serviceName;
+        private double cost;
+        public Service(String serviceName, double cost){
+            this.serviceName = serviceName;
+            this.cost = cost;
+        }
+        public String getServiceName(){
+            return serviceName;
+        }
+        public double getCost(){
+            return cost;
+        }
+    }
 
+    public static class AddOnServiceManager{
+            private Map<String, List<Service>> servicesByReservation;
+            public AddOnServiceManager(){
+                this.servicesByReservation = new HashMap<>();
+            }
+            public void addService(String reservationID, List<Service> services){
+                    servicesByReservation.put(reservationID, services);
 
+            }
+            public double calculateTotalServiceCost(String reservationID){
+                double total = 0.0;
+                System.out.println("Reservation ID: "+reservationID);
+                if(!servicesByReservation.containsKey(reservationID)){
+                    return total;
+                }
+                for(Service service : servicesByReservation.get(reservationID)){
+                    total += service.getCost();
+                }
+                return total;
+            }
+    }
 
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
@@ -211,5 +245,16 @@ public class HotelBookingApp {
             allocator.allocateRoom(reservation,inventory);
               System.out.println("Processing booking for Guest :"+reservation.getGuestName()+", Room Type: "+reservation.getRoomType());
         }
+        System.out.println("Add-On Service Selection");
+        AddOnServiceManager serviceManager = new AddOnServiceManager();
+        String[] serviceNames = {"WiFi", "Breakfast", "Parking", "Spa"};
+        double[] serviceCosts = {10.0, 25.0, 15.0, 50.0};
+
+        List<Service> services = new ArrayList<>();
+        for (int i = 0; i < serviceNames.length; i++) {
+            services.add(new Service(serviceNames[i], serviceCosts[i]));
+        }
+        serviceManager.addService("Single-1",services);
+        System.out.println("Total Add-On Cost : "+serviceManager.calculateTotalServiceCost("Single-1"));
     }
 }
