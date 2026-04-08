@@ -216,6 +216,23 @@ public class HotelBookingApp {
         }
     }
 
+    public static class InvalidBookingException extends Exception {
+        public InvalidBookingException(String messsage){
+            super(messsage);
+        }
+    }
+
+    public static class ReservationValidator {
+        public void validate(String guestName, String room,RoomInventory inventory) throws InvalidBookingException{
+            if (!room.equalsIgnoreCase("single") &&
+            !room.equalsIgnoreCase("double") &&
+            !room.equalsIgnoreCase("suite")) {
+
+            throw new InvalidBookingException("Invalid room type selected.");
+        }
+        } 
+    }
+
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
 
@@ -297,5 +314,27 @@ public class HotelBookingApp {
         for (Reservation r : history.getConfirmedReservations()) {
             System.out.println(r);
         }
+
+        Scanner sc = new Scanner(System.in);
+
+        RoomInventory inventory2 = new RoomInventory();
+        ReservationValidator validator = new ReservationValidator();
+
+        System.out.print("Enter guest name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter room type (Single/Double/Suite): ");
+        String room = sc.nextLine();
+        try {
+            validator.validate(name, room, inventory2);
+            System.out.println("Booking successful!");
+        } 
+        catch (InvalidBookingException e) {
+            System.out.println("Booking failed: " + e.getMessage());
+        }
+        finally {
+            sc.close();
+        }
+       
     }
 }
