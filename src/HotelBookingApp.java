@@ -285,6 +285,39 @@ public class HotelBookingApp {
 
     }
 
+    public static class ConcurrentBookingProcessor implements Runnable {
+        private BookingRequestQueue bookingQueue;
+        private RoomInventory inventory;
+        private RoomAllocationService allocationService;
+
+        public ConcurrentBookingProcessor(
+            BookingRequestQueue bookingQueue,
+            RoomInventory inventory,
+            RoomAllocationService allocationService
+        ){
+            this.bookingQueue = bookingQueue;
+            this.inventory = inventory;
+            this.allocationService = allocationService;
+
+        }
+        @Override
+        public void run(){
+            while (true) {
+                Reservation reservation;
+                synchronized (bookingQueue) {
+                    if (!bookingQueue.hasPendingrequest()){
+                        break;
+                    }
+                reservation = bookingQueue.getNextRequest();
+                }
+
+                synchronized (inventory){
+                    allocationService.allocateRoom(reservation, inventory);
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println("Welcome to the Hotel Booking Management System.\nSystem initalized successfully\n");
 
@@ -386,6 +419,24 @@ public class HotelBookingApp {
         }
         finally {
             sc.close();
+        }
+
+        Thread t1 = new Thread(
+            new ConcurrentBookingProcessor(bookingQueue, inventory2, allocator)
+        );
+
+        Thread t2 = new Thread(
+            new ConcurrentBookingProcessor(bookingQueue, inventory2, allocator)
+        );
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            System.out.println("Thread execution interrupted.");
         }
        
     }
