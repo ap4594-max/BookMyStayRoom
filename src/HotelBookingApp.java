@@ -58,6 +58,10 @@ public class HotelBookingApp {
         public void updateAvailability(String roomType, int count){
             roomAvailability.put(roomType,count);
         }
+
+        public void releaseRoom(String roomType) {
+            System.out.println("Room restored to inventory: " + roomType);
+        }
     }
 
     public static class RoomService{
@@ -231,6 +235,54 @@ public class HotelBookingApp {
             throw new InvalidBookingException("Invalid room type selected.");
         }
         } 
+    }
+    public class CancellationService {
+        private Stack<String> releasedRoomIds;
+
+        private Map<String, String> reservationRoomTypeMap;
+
+        public CancellationService(){
+            releasedRoomIds = new Stack<>();
+            reservationRoomTypeMap = new HashMap<>();
+        }
+
+        public void registerBooking(String reservationId, String roomType){
+            reservationRoomTypeMap.put(reservationId, roomType);
+            System.out.println("Booking registered: "+reservationId + " -> " + roomType);
+        }
+
+        public void cancelBooking(String reservationID, RoomInventory inventory){
+            if(!reservationRoomTypeMap.containsKey(reservationID)){
+                System.out.println("Invalid reservation ID.");
+                return;
+            }
+            String roomType = reservationRoomTypeMap.get(reservationID);
+            int current = inventory.getRoomAvailability().get(roomType);
+            inventory.updateAvailability(roomType, current+1);
+
+            releasedRoomIds.push(reservationID);
+
+            reservationRoomTypeMap.remove(reservationID);
+
+            System.out.println("Booking cancelled: "+ reservationID);
+
+        }
+
+        public void showRollbackHistory(){
+            if(releasedRoomIds.isEmpty()){
+                System.out.println("No cancellations yet.");
+                return;
+            }
+            System.out.println("Rollback History(Most recent first):");
+
+            Stack<String> temStack = new Stack<>();
+            temStack.addAll(releasedRoomIds);
+
+            while (!temStack.isEmpty()) {
+                System.out.println(temStack.pop()); 
+            }
+        }
+
     }
 
     public static void main(String[] args) {
